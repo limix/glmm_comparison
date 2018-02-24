@@ -3,9 +3,9 @@ import numpy_sugar as ns
 from glimix_core.glmm import GLMMExpFam
 from time import time
 
-G = np.load('G.npy')
-ntri = np.load('ntri.npy')
-nsuc = np.load('nsuc.npy')
+G = np.load('null_G.npy')
+ntri = np.load('null_ntri.npy')
+nsuc = np.load('null_nsuc.npy')
 N, P = G.shape
 
 QS = ns.linalg.economic_qs(G.dot(G.T))

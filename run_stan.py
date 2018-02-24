@@ -4,7 +4,6 @@ import numpy as np
 from time import time
 import pickle as pkl
 
-
 if not os.path.exists('stan.pickle'):
     stan_code = open("glmm.stan").read()
     sm = pystan.StanModel(model_code=stan_code)
@@ -14,9 +13,9 @@ else:
     with open('stan.pickle', 'rb') as f:
         sm = pkl.load(f)
 
-G = np.load('G.npy')
-ntri = np.load('ntri.npy')
-nsuc = np.load('nsuc.npy')
+G = np.load('null_G.npy')
+ntri = np.load('null_ntri.npy')
+nsuc = np.load('null_nsuc.npy')
 N, P = G.shape
 data = {'G': G, 'N': N, 'P': P, 'ntri': ntri, 'nsuc': nsuc}
 

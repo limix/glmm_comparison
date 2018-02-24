@@ -33,5 +33,5 @@ if __name__ == '__main__':
     # ntri = random.randint(10, 300, N)
     nsuc = random.binomial(ntri, theta)
 
-    np.save('ntri', ntri)
-    np.save('nsuc', nsuc)
+    np.save('null_ntri', ntri)
+    np.save('null_nsuc', nsuc)
