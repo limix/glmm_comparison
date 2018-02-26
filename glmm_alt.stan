@@ -25,7 +25,7 @@ model {
     vector[N] z;
 
     e ~ normal(0, sigma_e);
-    u_effsiz ~ multi_normal(0, sigma_g);
+    u_effsiz ~ normal(0, sigma_g);
 
     z = offset + g * snp_effect + u + e;
     nsuc ~ binomial_logit(ntri, z);
