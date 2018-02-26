@@ -19,12 +19,18 @@ if __name__ == '__main__':
     G /= G.std(0)
     G -= G.mean(0)
     G /= sqrt(G.shape[1])
-    np.save('G', G)
+    # np.save('G', G)
+    np.save('K', G.dot(G.T))
+
+    X = random.randn(N, 2)
+    X[:, 0] = 1
+    np.save('X', X)
 
     Gcandidates = G[:, :ncandidates].copy()
     Gcandidates /= Gcandidates.std(0)
     Gcandidates /= sqrt(Gcandidates.shape[1])
-    np.save('Gcandidates', Gcandidates)
+    np.save('G', Gcandidates)
+    # np.save('Gcandidates', Gcandidates)
 
     u = random.randn(P)
     u = sqrt(h2) * G.dot(u)

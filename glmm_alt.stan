@@ -1,19 +1,19 @@
 data {
     int<lower=0> N; // number of samples
+    int<lower=0> P; // number of covariates
     int nsuc[N];
     int ntri[N];
-    matrix[N, N] K;
-    vector[N] g;
+    matrix[N, P] X; // covariates
+    matrix[N, N] K; // kinship
 }
 transformed data {
     matrix[N, N] L;
     L = cholesky_decompose(K);
 }
 parameters {
-    vector[N] e;
+    vector[P] effsiz;
     vector[N] u_effsiz;
-    real offset;
-    real snp_effect;
+    vector[N] e;
     real<lower=0.0001> sigma_g;
     real<lower=0.0001> sigma_e;
 }
@@ -24,9 +24,9 @@ transformed parameters {
 model {
     vector[N] z;
 
-    e ~ normal(0, sigma_e);
     u_effsiz ~ normal(0, sigma_g);
+    e ~ normal(0, sigma_e);
 
-    z = offset + g * snp_effect + u + e;
+    z = X * effsiz + u + e;
     nsuc ~ binomial_logit(ntri, z);
 }

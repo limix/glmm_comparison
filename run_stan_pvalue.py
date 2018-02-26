@@ -67,7 +67,7 @@ def read_data():
     nsuc = np.load('nsuc.npy')
     N, P = G.shape
     K = G.dot(G.T)
-    K += np.eye(K.shape[0]) * 1e-6
+    K += np.eye(K.shape[0]) * 1e-5
     data = {
         'K': K,
         'N': N,
@@ -146,7 +146,7 @@ def main(nworkers):
     P = get_ncandidates()
 
     with Pool(processes=nworkers) as pool:
-        lmls = pool.map(worker, range(P))
+        lmls = pool.map(worker, range(P + 1))
 
     null_lml = lmls[0]
     alt_lmls = lmls[1:]
