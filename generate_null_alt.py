@@ -8,10 +8,10 @@ if __name__ == '__main__':
     N = int(sys.argv[1])
     P = N
     h2 = 0.25
-    c2 = 0.10
+    c2 = 0.20
     offset = 0
     ncandidates = 10
-    ncausals = 5
+    ncausals = 1
 
     random = np.random.RandomState()
 

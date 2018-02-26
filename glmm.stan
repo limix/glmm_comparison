@@ -4,23 +4,27 @@ data {
     int ntri[N];
     matrix[N, N] K;
 }
-
+transformed data {
+    matrix[N, N] L;
+    L = cholesky_decompose(K);
+}
 parameters {
     vector[N] e;
-    vector[N] u;
+    vector[N] u_effsiz;
     real offset;
     real<lower=0.0001> sigma_g;
     real<lower=0.0001> sigma_e;
 }
-
+transformed parameters {
+    vector[N] u;
+    u  = L * u_effsiz;
+}
 model {
     vector[N] z;
-    vector[N] zeros;
-    for (n in 1:N) {
-        e[n] ~ normal(0, sigma_e);
-        zeros[n] = 0;
-    }
-    u ~ multi_normal(zeros, K);
+
+    e ~ normal(0, sigma_e);
+    u_effsiz ~ multi_normal(0, sigma_g);
+
     z = offset + sigma_g * u + e;
     nsuc ~ binomial_logit(ntri, z);
 }

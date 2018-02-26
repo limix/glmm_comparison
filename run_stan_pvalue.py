@@ -1,6 +1,8 @@
 import os
+import sys
 import pickle as pkl
 from time import time
+from multiprocessing import Pool
 
 import numpy as np
 import pystan
@@ -111,30 +113,52 @@ def extract_params_alt(fit):
     }
 
 
-def get_null_lml(sm, data):
-    fit = sm.sampling(data=data, iter=1000, chains=1)
+def get_null_lml():
+    sm = load_stan_model()
+    data = read_data()
+    fit = sm.sampling(data=data, n_jobs=1)
     params = extract_params_null(fit)
     return params['lp']
 
 
-def get_alt_lmls(sm, data):
-    alt_lmls = []
+def get_alt_lml(i):
+    sm = load_stan_alt_model()
+    data = read_data()
     X = data['Gcandidates']
-    for i in range(X.shape[1]):
-        data['g'] = data['Gcandidates'][:, i]
-        fit = sm.sampling(data=data, iter=1000, chains=1)
-        params = extract_params_null(fit)
-        alt_lmls.append(params['lp'])
-    return alt_lmls
+    data['g'] = X[:, i]
+    fit = sm.sampling(data=data, n_jobs=1)
+    params = extract_params_null(fit)
+    return params['lp']
 
 
-sm_null = load_stan_model()
-sm_alt = load_stan_alt_model()
-data = read_data()
+def get_ncandidates():
+    data = read_data()
+    return data['Gcandidates'].shape[1]
 
-null_lml = get_null_lml(sm_null, data)
-alt_lmls = get_alt_lmls(sm_alt, data)
 
-pv = limix.stats.lrt_pvalues(null_lml, alt_lmls)
-print(pv)
-# np.save("out/stan_N{}".format(N), elapsed)
+def worker(i):
+    if i == 0:
+        return get_null_lml()
+    return get_alt_lml(i - 1)
+
+
+def main(nworkers):
+    P = get_ncandidates()
+
+    with Pool(processes=nworkers) as pool:
+        lmls = pool.map(worker, range(P))
+
+    null_lml = lmls[0]
+    alt_lmls = lmls[1:]
+
+    pv = limix.stats.lrt_pvalues(null_lml, alt_lmls)
+    print(pv)
+    # np.save("out/stan_N{}".format(N), elapsed)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 2:
+        nworkers = int(sys.argv[1])
+    else:
+        nworkers = 1
+    main(nworkers)
